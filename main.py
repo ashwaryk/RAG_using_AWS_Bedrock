@@ -1,4 +1,5 @@
 import boto3
+import os
 import streamlit as st
 from langchain.llms.bedrock import Bedrock
 from langchain.embeddings import BedrockEmbeddings
@@ -7,6 +8,13 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
+from dotenv import load_dotenv
+
+load_dotenv()
+
+aws_access_key_id = os.getenv('aws_access_key_id')
+aws_secret_access_key = os.getenv('aws_secret_access_key')
+region_name = os.getenv('region_name')
 
 
 prompt_template = """
@@ -26,7 +34,9 @@ Assistant:"""
 # Bedrock client
 bedrock = boto3.client(
     service_name = "bedrock-runtime", 
-    region_name = "us-east-1"
+    region_name = "us-east-1",
+    aws_access_key_id = aws_access_key_id,
+    aws_secret_access_key = aws_secret_access_key
     )
 
 # Get embedding model from bedrock
@@ -105,7 +115,5 @@ def main():
                 st.write(get_llm_response(llm, faiss_index, user_question))
 
             
-
-
 if __name__ == "__main__":
     main()
